@@ -11,7 +11,6 @@ Página web para que estudiantes de la UC decidan **qué y dónde almorzar en el
 - Guía de servicios de alimentación del campus San Joaquín (UC, 2020).
 - Observación del grupo.
 
-Los precios son aproximados.
 
 ## Equipo
 
