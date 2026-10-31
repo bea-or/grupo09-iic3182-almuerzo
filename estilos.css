@@ -275,7 +275,6 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
 .detalle-subtitulo { font-size: 1.05rem; margin: 22px 0 8px; }
 
 .menu-caja { background: var(--fondo); border-radius: 10px; padding: 14px 16px; }
-.menu-titulo { font-size: 1rem; margin-bottom: 8px; color: var(--azul); }
 .menu-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
 .menu-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 0; }
 .menu-item + .menu-item { border-top: 1px solid var(--borde); }

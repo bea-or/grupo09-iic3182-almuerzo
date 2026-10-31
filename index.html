@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>¿Dónde almuerzo hoy?</title>
+  <title>Dónde almorzar</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&display=swap">
@@ -102,7 +103,6 @@
 
     <h3 class="detalle-subtitulo">Qué venden</h3>
     <div class="menu-caja">
-      <h4 class="menu-titulo">Menú</h4>
       <ul id="detalle-menu" class="menu-lista"></ul>
     </div>
 
@@ -120,8 +120,8 @@
 
     // ---------- Utilidades ----------
     const VISTAS = {
-      "ver-locales": "Ver locales",
-      "elige-donde-almorzar": "Elige dónde almorzar"
+      "ver-locales": "Locales",
+      "elige-donde-almorzar": "Elegir plato"
     };
     const VISTA_INICIAL = "ver-locales";
     const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
@@ -310,7 +310,7 @@
         abiertoDesdeApp = rutaAnterior !== null && rutaAnterior in VISTAS;
         mostrarVista(vistaFondo);
         llenarDetalle(local);
-        document.title = local.nombre + " · ¿Dónde almuerzo hoy?";
+        document.title = "Dónde almorzar · " + local.nombre;
         if (!dialogo.open) dialogo.showModal();
         rutaAnterior = ruta;
         return;
@@ -322,7 +322,7 @@
       const cambioDeVista = ruta !== vistaFondo || rutaAnterior === null;
       vistaFondo = ruta;
       mostrarVista(ruta);
-      document.title = VISTAS[ruta] + " · ¿Dónde almuerzo hoy?";
+      document.title = "Dónde almorzar · " + VISTAS[ruta];
       // Al cambiar de vista se sube al inicio; al cerrar el pop-up se mantiene la posición.
       if (cambioDeVista && !(rutaAnterior || "").startsWith("local-")) window.scrollTo(0, 0);
       rutaAnterior = ruta;
