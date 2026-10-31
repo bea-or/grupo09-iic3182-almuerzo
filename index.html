@@ -190,16 +190,25 @@
     // ---------- Vista: Ver locales ----------
     let textoBusqueda = "";
 
+    // Rango de precios calculado desde el menú: "$4.500 – $7.990", "$3.500" o "" (por confirmar).
+    function rangoPrecios(local) {
+      const precios = (local.menu || []).map((p) => p.precio).filter(Number.isFinite);
+      if (!precios.length) return "";
+      const min = Math.min(...precios), max = Math.max(...precios);
+      return min === max ? formatearPrecio(min) : formatearPrecio(min) + " – " + formatearPrecio(max);
+    }
+
     function tarjetaLocal(local) {
-      const tags = (local.tags || []).map((t) => `<li class="tag">${esc(t)}</li>`).join("");
+      const tags = [`<li class="tag tag-precio-local">${esc(rangoPrecios(local))}</li>`]
+        .concat((local.tags || []).map((t) => `<li class="tag">${esc(t)}</li>`)).join("");
       return `
         <article class="tarjeta">
           <div class="tarjeta-cabecera">
             <h3 class="tarjeta-nombre">${esc(local.nombre)}</h3>
             <a class="ver-detalle" href="#local-${encodeURIComponent(local.id)}">Ver detalle<span class="visualmente-oculto"> de ${esc(local.nombre)}</span></a>
           </div>
-          <p class="tarjeta-linea">${esc(local.zona)}</p>
-          <p class="tarjeta-linea">${esc(local.tipoComida)}</p>
+          <p class="tarjeta-linea tarjeta-zona">${esc(local.zona)}</p>
+          <p class="tarjeta-linea tarjeta-tipo">${esc(local.tipoComida)}</p>
           ${tags ? `<ul class="tags">${tags}</ul>` : ""}
           ${botonProbado(local)}
         </article>`;

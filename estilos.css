@@ -164,6 +164,7 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
 #detalle-comprar:empty::before,
 .tag-precio:empty::before,
 .resultado-precio:empty::before,
+.tag-precio-local:empty::before,
 .pc {
   display: inline-block;
   padding: 1px 10px;
@@ -176,7 +177,13 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
 .detalle-datos dd:empty::before,
 #detalle-comprar:empty::before,
 .tag-precio:empty::before,
-.resultado-precio:empty::before { content: "por confirmar"; }
+.resultado-precio:empty::before,
+.tag-precio-local:empty::before { content: "por confirmar"; }
+/* En las tarjetas se dice qué dato falta, para no repetir "por confirmar" sin contexto */
+.tarjeta-zona:empty::before { content: "ubicación por confirmar"; }
+.tarjeta-tipo:empty::before { content: "tipo de comida por confirmar"; }
+.tag-precio-local:empty::before { content: "precio por confirmar"; }
+.tag-precio-local:empty { padding: 0; background: none; }
 
 /* --- Elige dónde almorzar --- */
 .elige {

@@ -42,7 +42,7 @@ const DATOS = {
       tipoComida: "Platos preparados y ensaladas",
 
       // Etiquetas libres que se ven en la tarjeta (ej: precio aproximado).
-      tags: ["~$4.500-8.000"],
+      tags: [],
 
       horario: "8:00 a 19:00 (según guía UC 2020, por confirmar)",
 
@@ -63,7 +63,7 @@ const DATOS = {
       zona: "Edificio K",
       ubicacionExacta: "Edificio K (Ciencia y Tecnología, Ingeniería), 1er piso",
       tipoComida: "Burritos, tacos, fajitas, hamburguesas y casino",
-      tags: ["~$6.000"],
+      tags: [],
       horario: "Burga: 11:30 a 16:00 (según guía UC 2020). Resto del casino por confirmar.",
       comoComprar: "Elige y paga en la caja, y luego ve al mesón donde preparan tu plato frente a ti. Hay mucho ruido: repite tu pedido y revísalo antes de que lo terminen.",
       menu: [
@@ -113,7 +113,7 @@ const DATOS = {
       zona: "",
       ubicacionExacta: "",
       tipoComida: "Sándwiches y empanadas",
-      tags: ["~$3.000", "Económico"],
+      tags: ["Económico"],
       horario: "",
       comoComprar: "",
       menu: [
