@@ -14,6 +14,7 @@
   <!-- ===== Barra superior (común a todas las vistas) ===== -->
   <header class="barra">
     <a class="marca" href="#ver-locales">¿Dónde almuerzo hoy?</a>
+    <p class="marca-subtexto">Qué hay en el campus San Joaquín, cuánto cuesta y cómo se compra, antes de caminar hasta el local.</p>
     <nav class="nav" aria-label="Vistas">
       <a class="nav-boton" href="#ver-locales" data-vista="ver-locales">Ver locales</a>
       <a class="nav-boton" href="#elige-donde-almorzar" data-vista="elige-donde-almorzar">Elige dónde almorzar</a>
@@ -24,6 +25,8 @@
     <!-- ===== Vista 1: Ver locales (#ver-locales) ===== -->
     <section id="vista-ver-locales" class="vista" hidden aria-labelledby="titulo-ver-locales">
       <h1 id="titulo-ver-locales" class="vista-titulo">Ve los lugares disponibles para comprar tu almuerzo hoy.</h1>
+      <p class="vista-subtexto">Toca un local para ver qué vende, precios, horario y cómo se compra.</p>
+      <p class="vista-leyenda">Lo marcado como <span class="pc">por confirmar</span> todavía no se ha verificado en el local.</p>
       <p class="actualizacion">Última fecha de actualización: <span id="fecha-actualizacion"></span></p>
 
       <label class="buscador">
@@ -42,6 +45,7 @@
     <!-- ===== Vista 2: Elige dónde almorzar (#elige-donde-almorzar) ===== -->
     <section id="vista-elige-donde-almorzar" class="vista" hidden aria-labelledby="titulo-elige">
       <h1 id="titulo-elige" class="vista-titulo">Elegir para hoy</h1>
+      <p class="vista-subtexto">Cuéntanos cómo viene tu día y te mostramos los platos que calzan. </p>
 
       <div class="elige">
         <aside class="filtros" aria-label="Filtros">
@@ -50,9 +54,9 @@
           <div class="filtro-grupo" role="group" aria-labelledby="f-precio">
             <h3 id="f-precio">¿Cuánto quieres gastar?</h3>
             <div class="chips" data-grupo="precio">
-              <button type="button" class="chip" data-valor="3500" aria-pressed="false">0-3500</button>
-              <button type="button" class="chip" data-valor="5500" aria-pressed="false">hasta 5500</button>
-              <button type="button" class="chip" data-valor="sin-limite" aria-pressed="false">sin lím.</button>
+              <button type="button" class="chip" data-valor="3500" aria-pressed="false">Hasta $3.500</button>
+              <button type="button" class="chip" data-valor="5500" aria-pressed="false">Hasta $5.500</button>
+              <button type="button" class="chip" data-valor="sin-limite" aria-pressed="false">Sin límite</button>
             </div>
           </div>
 
@@ -62,6 +66,9 @@
               <button type="button" class="chip" data-valor="liviano" aria-pressed="false">Liviano</button>
               <button type="button" class="chip" data-valor="contundente" aria-pressed="false">Contundente</button>
               <button type="button" class="chip" data-valor="para-el-camino" aria-pressed="false">Para comer en el camino</button>
+              <button type="button" class="chip" data-valor="saludable" aria-pressed="false">Saludable</button>
+              <button type="button" class="chip" data-valor="comida-casera" aria-pressed="false">Comida casera</button>
+              <button type="button" class="chip" data-valor="antojo" aria-pressed="false">Antojo</button>
             </div>
           </div>
 
@@ -188,10 +195,27 @@
     const filtros = { precio: null, categoria: null, ubicacion: null };
 
     function cumpleFiltros(local, plato) {
-      if (filtros.precio && filtros.precio !== "sin-limite" && plato.precio > Number(filtros.precio)) return false;
+      if (filtros.precio && filtros.precio !== "sin-limite" &&
+          !(Number.isFinite(plato.precio) && plato.precio <= Number(filtros.precio))) return false;
       if (filtros.categoria && !(plato.categorias || []).includes(filtros.categoria)) return false;
       if (filtros.ubicacion && local.ubicacion !== filtros.ubicacion) return false;
       return true;
+    }
+
+    // Texto que se muestra para cada categoría (igual que los botones del filtro).
+    const NOMBRE_CATEGORIA = {
+      liviano: "Liviano",
+      contundente: "Contundente",
+      "para-el-camino": "Para comer en el camino",
+      saludable: "Saludable",
+      "comida-casera": "Comida casera",
+      antojo: "Antojo"
+    };
+
+    function etiquetasCategorias(plato) {
+      const items = (plato.categorias || [])
+        .map((c) => `<li class="tag tag-categoria">${esc(NOMBRE_CATEGORIA[c] || c)}</li>`).join("");
+      return items ? `<ul class="tags">${items}</ul>` : "";
     }
 
     function renderElige() {
@@ -208,8 +232,15 @@
       $("resultados-lista").innerHTML = resultados.length
         ? resultados.map(({ local, plato }) => `
             <article class="resultado">
-              <h3 class="resultado-titulo">${esc(plato.plato)} – ${esc(local.nombre)}</h3>
-              <a class="boton" href="#local-${encodeURIComponent(local.id)}">Ver local<span class="visualmente-oculto"> ${esc(local.nombre)}</span></a>
+              <div class="resultado-cabecera">
+                <div>
+                  <h3 class="resultado-titulo">${esc(plato.plato)}</h3>
+                  <p class="resultado-local">en ${esc(local.nombre)}</p>
+                </div>
+                <span class="resultado-precio">${Number.isFinite(plato.precio) ? "≈ " + esc(formatearPrecio(plato.precio)) : ""}</span>
+              </div>
+              ${etiquetasCategorias(plato)}
+              <a class="boton boton-secundario" href="#local-${encodeURIComponent(local.id)}">Más información<span class="visualmente-oculto"> ${esc(local.nombre)}</span></a>
             </article>`).join("")
         : `<p class="vacio">No hay opciones con estos filtros. Prueba quitando alguno.</p>`;
     }

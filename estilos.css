@@ -39,7 +39,7 @@ h1, h2, h3, h4 { font-weight: 800; line-height: 1.2; }
 /* Franja azul ancha con el título grande en blanco */
 .marca {
   display: block;
-  padding: 36px var(--gutter) 30px;
+  padding: 36px var(--gutter) 8px;
   background: var(--azul);
   color: #fff;
   font-size: clamp(1.9rem, 6vw, 2.9rem);
@@ -56,6 +56,15 @@ h1, h2, h3, h4 { font-weight: 800; line-height: 1.2; }
   margin-bottom: 14px;
   border-radius: 4px;
   background: var(--amarillo);
+}
+
+/* Subtexto bajo el título, dentro de la misma franja azul */
+.marca-subtexto {
+  margin: 0;
+  padding: 0 var(--gutter) 30px;
+  background: var(--azul);
+  color: #D7E2F5;
+  font-size: 1.1rem;
 }
 
 /* Barra azul oscuro con texto blanco */
@@ -81,6 +90,9 @@ h1, h2, h3, h4 { font-weight: 800; line-height: 1.2; }
 /* ===== Vistas ===== */
 main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
 .vista-titulo { font-size: 1.5rem; }
+/* Subtextos bajo el título de cada vista */
+.vista-subtexto { color: var(--texto-suave); font-size: 1.1rem; margin-top: 6px; max-width: 65ch; }
+.vista-leyenda { color: var(--texto-suave); margin-top: 6px; }
 .seccion-titulo { font-size: 1.25rem; margin: 32px 0 14px; }
 .vacio { color: var(--texto-suave); font-style: italic; }
 
@@ -150,8 +162,9 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
 .tarjeta-linea:empty::before,
 .detalle-datos dd:empty::before,
 #detalle-comprar:empty::before,
-.tag-precio:empty::before {
-  content: "por confirmar";
+.tag-precio:empty::before,
+.resultado-precio:empty::before,
+.pc {
   display: inline-block;
   padding: 1px 10px;
   font-size: 0.82rem; font-weight: 700; font-style: normal;
@@ -159,6 +172,11 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
   border: 2px dashed var(--amarillo);
   border-radius: 999px;
 }
+.tarjeta-linea:empty::before,
+.detalle-datos dd:empty::before,
+#detalle-comprar:empty::before,
+.tag-precio:empty::before,
+.resultado-precio:empty::before { content: "por confirmar"; }
 
 /* --- Elige dónde almorzar --- */
 .elige {
@@ -170,6 +188,9 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
   background: var(--superficie);
   border: 1.5px solid var(--borde); border-radius: var(--radio);
   padding: 18px;
+  /* Se queda fijo al hacer scroll por los resultados */
+  position: sticky; top: 16px;
+  max-height: calc(100vh - 32px); overflow-y: auto;
 }
 .filtros-titulo { font-size: 1.2rem; margin-bottom: 12px; }
 .filtro-grupo + .filtro-grupo { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--borde); }
@@ -193,9 +214,19 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
 .resultados-lista { display: flex; flex-direction: column; gap: 12px; }
 .resultado {
   padding: 16px;
-  display: flex; flex-direction: column; align-items: flex-start; gap: 12px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
 }
-.resultado-titulo { font-size: 1.1rem; }
+/* Nombre del plato y local a la izquierda, precio a la derecha */
+.resultado-cabecera {
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 12px; flex-wrap: wrap; width: 100%;
+}
+.resultado-titulo { font-size: 1.15rem; font-weight: 800; }
+.resultado-local { color: var(--texto-suave); }
+.resultado-precio { font-weight: 800; white-space: nowrap; }
+.resultado .tags { margin-top: 0; }
+/* Categorías del plato: gris claro, distinto del celeste del precio */
+.tag-categoria { background: var(--fondo); color: var(--texto); }
 
 .boton {
   display: inline-flex; align-items: center;
@@ -205,6 +236,12 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
   transition: background-color 0.15s;
 }
 .boton:hover { background: var(--azul-oscuro); }
+/* Botón con borde: fondo blanco y texto azul */
+.boton-secundario {
+  color: var(--azul); background: var(--superficie);
+  border: 2px solid var(--azul); border-radius: 10px;
+}
+.boton-secundario:hover { background: var(--celeste); }
 
 /* ===== Pop-up de detalle ===== */
 .detalle {
@@ -250,7 +287,9 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
 /* ===== Celular ===== */
 @media (max-width: 680px) {
   .elige { grid-template-columns: minmax(0, 1fr); }
-  .marca { padding-top: 28px; padding-bottom: 24px; }
+  .filtros { position: static; max-height: none; overflow: visible; }
+  .marca { padding-top: 28px; }
+  .marca-subtexto { padding-bottom: 24px; font-size: 1rem; }
   .nav { padding: 0; }
   .nav-boton { flex: 1 1 0; padding: 0 10px; text-align: center; }
   main { padding-top: 22px; }
