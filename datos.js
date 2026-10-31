@@ -134,7 +134,9 @@ const DATOS = {
       horario: "",
       comoComprar: "",
       menu: [
-        { plato: "Pizza para compartir", precio: null, categorias: ["contundente", "antojo"] }
+        { plato: "Pizza queso", precio: 5500, categorias: ["contundente", "antojo"] },
+        { plato: "Pizza pepperoni", precio: 5500, categorias: ["contundente", "antojo"] },
+        { plato: "Pizza italian 3 cheese", precio: 6500, categorias: ["contundente", "antojo"] }
       ]
     },
 
