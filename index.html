@@ -64,7 +64,8 @@
 
           <div class="filtro-grupo" role="group" aria-labelledby="f-tipo">
             <h3 id="f-tipo">¿Qué necesitas hoy?</h3>
-            <div class="chips" data-grupo="categoria">
+            <p class="filtro-ayuda">Puedes elegir varias.</p>
+            <div class="chips" data-grupo="categoria" data-multiple>
               <button type="button" class="chip" data-valor="liviano" aria-pressed="false">Liviano</button>
               <button type="button" class="chip" data-valor="contundente" aria-pressed="false">Contundente</button>
               <button type="button" class="chip" data-valor="para-el-camino" aria-pressed="false">Para comer en el camino</button>
@@ -263,13 +264,14 @@
     });
 
     // ---------- Vista: Elige dónde almorzar ----------
-    // Un valor por grupo (null = sin filtro en ese grupo).
-    const filtros = { precio: null, categoria: null, ubicacion: null, probados: null };
+    // Un valor por grupo (null = sin filtro en ese grupo), salvo "categoria",
+    // que admite varias opciones a la vez y el plato debe cumplirlas todas.
+    const filtros = { precio: null, categoria: [], ubicacion: null, probados: null };
 
     function cumpleFiltros(local, plato) {
       if (filtros.precio && filtros.precio !== "sin-limite" &&
           !(Number.isFinite(plato.precio) && plato.precio <= Number(filtros.precio))) return false;
-      if (filtros.categoria && !(plato.categorias || []).includes(filtros.categoria)) return false;
+      if (!filtros.categoria.every((c) => (plato.categorias || []).includes(c))) return false;
       if (filtros.ubicacion && local.ubicacion !== filtros.ubicacion) return false;
       if (filtros.probados && probados.has(local.id)) return false;
       return true;
@@ -324,10 +326,19 @@
         const chip = e.target.closest(".chip");
         if (!chip) return;
         const clave = grupo.dataset.grupo;
-        // Selección única por grupo: tocar la opción activa la desmarca.
-        filtros[clave] = filtros[clave] === chip.dataset.valor ? null : chip.dataset.valor;
+        const valor = chip.dataset.valor;
+        if (grupo.hasAttribute("data-multiple")) {
+          // Selección múltiple: cada opción se marca o desmarca por separado.
+          filtros[clave] = filtros[clave].includes(valor)
+            ? filtros[clave].filter((v) => v !== valor)
+            : filtros[clave].concat(valor);
+        } else {
+          // Selección única por grupo: tocar la opción activa la desmarca.
+          filtros[clave] = filtros[clave] === valor ? null : valor;
+        }
+        const activos = [].concat(filtros[clave] ?? []);
         grupo.querySelectorAll(".chip").forEach((c) =>
-          c.setAttribute("aria-pressed", String(c.dataset.valor === filtros[clave])));
+          c.setAttribute("aria-pressed", String(activos.includes(c.dataset.valor))));
         renderElige();
       });
     });
