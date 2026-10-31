@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>¿Dónde almuerzo hoy?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700;800&display=swap">
+  <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+  <!-- ===== Barra superior (común a todas las vistas) ===== -->
+  <header class="barra">
+    <a class="marca" href="#ver-locales">¿Dónde almuerzo hoy?</a>
+    <nav class="nav" aria-label="Vistas">
+      <a class="nav-boton" href="#ver-locales" data-vista="ver-locales">Ver locales</a>
+      <a class="nav-boton" href="#elige-donde-almorzar" data-vista="elige-donde-almorzar">Elige dónde almorzar</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ===== Vista 1: Ver locales (#ver-locales) ===== -->
+    <section id="vista-ver-locales" class="vista" hidden aria-labelledby="titulo-ver-locales">
+      <h1 id="titulo-ver-locales" class="vista-titulo">Ve los lugares disponibles para comprar tu almuerzo hoy.</h1>
+      <p class="actualizacion">Última fecha de actualización: <span id="fecha-actualizacion"></span></p>
+
+      <label class="buscador">
+        <span class="visualmente-oculto">Busca un local</span>
+        <svg class="buscador-icono" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
+        <input id="buscador" type="search" placeholder="Busca un local" autocomplete="off">
+      </label>
+
+      <h2 class="seccion-titulo">En el campus:</h2>
+      <div id="locales-dentro" class="grilla-tarjetas"></div>
+
+      <h2 class="seccion-titulo">Fuera del campus</h2>
+      <div id="locales-fuera" class="grilla-tarjetas"></div>
+    </section>
+
+    <!-- ===== Vista 2: Elige dónde almorzar (#elige-donde-almorzar) ===== -->
+    <section id="vista-elige-donde-almorzar" class="vista" hidden aria-labelledby="titulo-elige">
+      <h1 id="titulo-elige" class="vista-titulo">Elegir para hoy</h1>
+
+      <div class="elige">
+        <aside class="filtros" aria-label="Filtros">
+          <h2 class="filtros-titulo">Filtros</h2>
+
+          <div class="filtro-grupo" role="group" aria-labelledby="f-precio">
+            <h3 id="f-precio">¿Cuánto quieres gastar?</h3>
+            <div class="chips" data-grupo="precio">
+              <button type="button" class="chip" data-valor="3500" aria-pressed="false">0-3500</button>
+              <button type="button" class="chip" data-valor="5500" aria-pressed="false">hasta 5500</button>
+              <button type="button" class="chip" data-valor="sin-limite" aria-pressed="false">sin lím.</button>
+            </div>
+          </div>
+
+          <div class="filtro-grupo" role="group" aria-labelledby="f-tipo">
+            <h3 id="f-tipo">¿Qué necesitas hoy?</h3>
+            <div class="chips" data-grupo="categoria">
+              <button type="button" class="chip" data-valor="liviano" aria-pressed="false">Liviano</button>
+              <button type="button" class="chip" data-valor="contundente" aria-pressed="false">Contundente</button>
+              <button type="button" class="chip" data-valor="para-el-camino" aria-pressed="false">Para comer en el camino</button>
+            </div>
+          </div>
+
+          <div class="filtro-grupo" role="group" aria-labelledby="f-ubicacion">
+            <h3 id="f-ubicacion">Ubicación</h3>
+            <div class="chips" data-grupo="ubicacion">
+              <button type="button" class="chip" data-valor="dentro" aria-pressed="false">Dentro del campus</button>
+              <button type="button" class="chip" data-valor="fuera" aria-pressed="false">Fuera del campus</button>
+            </div>
+          </div>
+        </aside>
+
+        <div class="resultados">
+          <p id="resultados-conteo" class="resultados-conteo" aria-live="polite"></p>
+          <div id="resultados-lista" class="resultados-lista"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== Pop-up de detalle de un local (#local-<id>) ===== -->
+  <dialog id="detalle" class="detalle" aria-labelledby="detalle-nombre">
+    <button type="button" id="detalle-cerrar" class="detalle-cerrar" aria-label="Cerrar">×</button>
+    <h2 id="detalle-nombre" class="detalle-nombre"></h2>
+    <p id="detalle-ubicacion" class="detalle-ubicacion"></p>
+
+    <dl class="detalle-datos">
+      <dt>Dónde</dt><dd id="detalle-donde"></dd>
+      <dt>Horario</dt><dd id="detalle-horario"></dd>
+    </dl>
+
+    <h3 class="detalle-subtitulo">Qué venden</h3>
+    <div class="menu-caja">
+      <h4 class="menu-titulo">Menú</h4>
+      <ul id="detalle-menu" class="menu-lista"></ul>
+    </div>
+
+    <h3 class="detalle-subtitulo">Cómo comprar</h3>
+    <p id="detalle-comprar"></p>
+
+    <h3 class="detalle-subtitulo">Lo que cuentan estudiantes</h3>
+    <p class="proximamente">Próximamente.</p>
+  </dialog>
+
+  <script src="datos.js"></script>
+  <script>
+  (function () {
+    "use strict";
+
+    // ---------- Utilidades ----------
+    const VISTAS = {
+      "ver-locales": "Ver locales",
+      "elige-donde-almorzar": "Elige dónde almorzar"
+    };
+    const VISTA_INICIAL = "ver-locales";
+    const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio",
+                   "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+    const locales = DATOS.locales;
+
+    const $ = (id) => document.getElementById(id);
+
+    function esc(texto) {
+      return String(texto ?? "").replace(/[&<>"']/g, (c) =>
+        ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+    }
+
+    // Quita tildes y mayúsculas para que la búsqueda "cafeteria" encuentre "Cafetería".
+    function normalizar(texto) {
+      return String(texto ?? "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+    }
+
+    function formatearFecha(iso) {
+      const [a, m, d] = String(iso).split("-").map(Number);
+      if (!a || !m || !d) return iso;
+      return d + " de " + MESES[m - 1] + " de " + a;
+    }
+
+    function formatearPrecio(n) {
+      return "$" + Number(n).toLocaleString("es-CL");
+    }
+
+    function textoUbicacion(ubicacion) {
+      return ubicacion === "dentro" ? "Dentro del campus" : "Fuera del campus";
+    }
+
+    // ---------- Vista: Ver locales ----------
+    let textoBusqueda = "";
+
+    function tarjetaLocal(local) {
+      const tags = (local.tags || []).map((t) => `<li class="tag">${esc(t)}</li>`).join("");
+      return `
+        <article class="tarjeta">
+          <div class="tarjeta-cabecera">
+            <h3 class="tarjeta-nombre">${esc(local.nombre)}</h3>
+            <a class="ver-detalle" href="#local-${encodeURIComponent(local.id)}">Ver detalle<span class="visualmente-oculto"> de ${esc(local.nombre)}</span></a>
+          </div>
+          <p class="tarjeta-linea">${esc(local.zona)}</p>
+          <p class="tarjeta-linea">${esc(local.tipoComida)}</p>
+          ${tags ? `<ul class="tags">${tags}</ul>` : ""}
+        </article>`;
+    }
+
+    function renderVerLocales() {
+      const q = normalizar(textoBusqueda.trim());
+      const coincide = (l) => !q || [l.nombre, l.zona, l.tipoComida, ...(l.tags || [])]
+        .some((campo) => normalizar(campo).includes(q));
+
+      for (const ubicacion of ["dentro", "fuera"]) {
+        const lista = locales.filter((l) => l.ubicacion === ubicacion && coincide(l));
+        $("locales-" + ubicacion).innerHTML = lista.length
+          ? lista.map(tarjetaLocal).join("")
+          : `<p class="vacio">${q ? "Ningún local coincide con la búsqueda." : "Aún no hay locales en esta sección."}</p>`;
+      }
+    }
+
+    $("fecha-actualizacion").textContent = formatearFecha(DATOS.ultimaActualizacion);
+    $("buscador").addEventListener("input", (e) => {
+      textoBusqueda = e.target.value;
+      renderVerLocales();
+    });
+
+    // ---------- Vista: Elige dónde almorzar ----------
+    // Un valor por grupo (null = sin filtro en ese grupo).
+    const filtros = { precio: null, categoria: null, ubicacion: null };
+
+    function cumpleFiltros(local, plato) {
+      if (filtros.precio && filtros.precio !== "sin-limite" && plato.precio > Number(filtros.precio)) return false;
+      if (filtros.categoria && !(plato.categorias || []).includes(filtros.categoria)) return false;
+      if (filtros.ubicacion && local.ubicacion !== filtros.ubicacion) return false;
+      return true;
+    }
+
+    function renderElige() {
+      const resultados = [];
+      for (const local of locales) {
+        for (const plato of local.menu || []) {
+          if (cumpleFiltros(local, plato)) resultados.push({ local, plato });
+        }
+      }
+
+      $("resultados-conteo").textContent = resultados.length === 1
+        ? "1 opción" : resultados.length + " opciones";
+
+      $("resultados-lista").innerHTML = resultados.length
+        ? resultados.map(({ local, plato }) => `
+            <article class="resultado">
+              <h3 class="resultado-titulo">${esc(plato.plato)} – ${esc(local.nombre)}</h3>
+              <a class="boton" href="#local-${encodeURIComponent(local.id)}">Ver local<span class="visualmente-oculto"> ${esc(local.nombre)}</span></a>
+            </article>`).join("")
+        : `<p class="vacio">No hay opciones con estos filtros. Prueba quitando alguno.</p>`;
+    }
+
+    document.querySelectorAll(".chips").forEach((grupo) => {
+      grupo.addEventListener("click", (e) => {
+        const chip = e.target.closest(".chip");
+        if (!chip) return;
+        const clave = grupo.dataset.grupo;
+        // Selección única por grupo: tocar la opción activa la desmarca.
+        filtros[clave] = filtros[clave] === chip.dataset.valor ? null : chip.dataset.valor;
+        grupo.querySelectorAll(".chip").forEach((c) =>
+          c.setAttribute("aria-pressed", String(c.dataset.valor === filtros[clave])));
+        renderElige();
+      });
+    });
+
+    // ---------- Pop-up de detalle ----------
+    const dialogo = $("detalle");
+
+    function llenarDetalle(local) {
+      $("detalle-nombre").textContent = local.nombre;
+      $("detalle-ubicacion").textContent = textoUbicacion(local.ubicacion);
+      $("detalle-donde").textContent = local.ubicacionExacta || "";
+      $("detalle-horario").textContent = local.horario || "";
+      $("detalle-comprar").textContent = local.comoComprar || "";
+      $("detalle-menu").innerHTML = (local.menu || []).length
+        ? local.menu.map((p) => `
+            <li class="menu-item">
+              <span>${esc(p.plato)}</span>
+              <span class="tag tag-precio">${Number.isFinite(p.precio) ? esc(formatearPrecio(p.precio)) : ""}</span>
+            </li>`).join("")
+        : `<li class="vacio">Sin platos registrados.</li>`;
+    }
+
+    // Cerrar el pop-up = volver a la vista de fondo.
+    // Si se abrió desde la app, se retrocede en el historial (igual que el botón "atrás");
+    // si se entró directo con el enlace, se reemplaza la dirección por la vista de fondo.
+    function cerrarDetalle() {
+      if (abiertoDesdeApp) history.back();
+      else location.replace("#" + vistaFondo);
+    }
+
+    $("detalle-cerrar").addEventListener("click", cerrarDetalle);
+    dialogo.addEventListener("cancel", (e) => { e.preventDefault(); cerrarDetalle(); }); // tecla Esc
+    dialogo.addEventListener("click", (e) => { if (e.target === dialogo) cerrarDetalle(); }); // clic fuera
+
+    // ---------- Navegación por dirección (#nombre-vista) ----------
+    let vistaFondo = VISTA_INICIAL; // vista que queda detrás del pop-up
+    let abiertoDesdeApp = false;
+    let rutaAnterior = null;
+
+    function mostrarVista(nombre) {
+      for (const v of Object.keys(VISTAS)) $("vista-" + v).hidden = v !== nombre;
+      document.querySelectorAll(".nav-boton").forEach((a) => {
+        if (a.dataset.vista === nombre) a.setAttribute("aria-current", "page");
+        else a.removeAttribute("aria-current");
+      });
+    }
+
+    function enrutar() {
+      const ruta = decodeURIComponent(location.hash.slice(1));
+
+      if (ruta.startsWith("local-")) {
+        const local = locales.find((l) => l.id === ruta.slice("local-".length));
+        if (!local) { location.replace("#" + vistaFondo); return; }
+        abiertoDesdeApp = rutaAnterior !== null && rutaAnterior in VISTAS;
+        mostrarVista(vistaFondo);
+        llenarDetalle(local);
+        document.title = local.nombre + " · ¿Dónde almuerzo hoy?";
+        if (!dialogo.open) dialogo.showModal();
+        rutaAnterior = ruta;
+        return;
+      }
+
+      if (!(ruta in VISTAS)) { location.replace("#" + VISTA_INICIAL); return; }
+
+      if (dialogo.open) dialogo.close();
+      const cambioDeVista = ruta !== vistaFondo || rutaAnterior === null;
+      vistaFondo = ruta;
+      mostrarVista(ruta);
+      document.title = VISTAS[ruta] + " · ¿Dónde almuerzo hoy?";
+      // Al cambiar de vista se sube al inicio; al cerrar el pop-up se mantiene la posición.
+      if (cambioDeVista && !(rutaAnterior || "").startsWith("local-")) window.scrollTo(0, 0);
+      rutaAnterior = ruta;
+    }
+
+    renderVerLocales();
+    renderElige();
+    window.addEventListener("hashchange", enrutar);
+    enrutar();
+  })();
+  </script>
+</body>
+</html>
