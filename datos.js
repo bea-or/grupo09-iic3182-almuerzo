@@ -67,7 +67,7 @@ const DATOS = {
       horario: "Burga: 11:30 a 16:00 (según guía UC 2020). Resto del casino por confirmar.",
       comoComprar: "Elige y paga en la caja, y luego ve al mesón donde preparan tu plato frente a ti. Hay mucho ruido: repite tu pedido y revísalo antes de que lo terminen.",
       menu: [
-        { plato: "Burrito", precio: 6000, categorias: ["contundente", "para-el-camino", "antojo"] },
+        { plato: "Burrito", precio: 6000, categorias: ["contundente", "para-el-camino", "saludable"] },
         { plato: "Hamburguesas (Burga)", precio: 4990, categorias: ["antojo"] },
         { plato: "Gohan", precio: null, categorias: [] },
         { plato: "Menú del casino", precio: null, categorias: [] }
