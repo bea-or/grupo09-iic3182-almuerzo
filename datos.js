@@ -1,19 +1,15 @@
 /*
  * DATOS DE "¿DÓNDE ALMUERZO HOY?"
  * ------------------------------------------------------------------
- * Este es el único archivo que hay que editar para agregar locales.
- * Para agregar uno nuevo: copia un bloque { ... } completo dentro de
- * "locales", pégalo después del último (separado por una coma) y
- * cambia sus valores.
- *
  * Fuentes: entrevistas P1–P5 de la Entrega 1 (oct. 2026), guía de
  * servicios de alimentación del campus San Joaquín (2020) y
  * observación del grupo. Los precios son aproximados.
  *
  * VALORES PERMITIDOS (escríbelos exactamente así):
  *   ubicacion   -> "dentro"  (en el campus)   o   "fuera"  (fuera del campus)
- *   categorias  -> "liviano", "contundente", "para-el-camino", "saludable"
- *                  (un plato puede tener una, varias o ninguna)
+ *   categorias  -> "liviano", "contundente", "para-el-camino", "saludable",
+ *                  "comida-casera", "antojo"
+ *                  (un plato puede tener una, varias o ninguna) (se pueden agregar más categorías adelante pero hay que modificar el código)
  *   precio      -> número entero en pesos, SIN puntos ni signo $
  *                  (ej: 3500, no "$3.500"), o null si está por confirmar
  *
@@ -46,7 +42,7 @@ const DATOS = {
       tipoComida: "Platos preparados y ensaladas",
 
       // Etiquetas libres que se ven en la tarjeta (ej: precio aproximado).
-      tags: ["~$4.500", "Fila hacia las 13:30"],
+      tags: ["~$4.500-8.000", "Fila hacia las 13:30"],
 
       horario: "8:00 a 19:00 (según guía UC 2020, por confirmar)",
 
@@ -56,7 +52,7 @@ const DATOS = {
       // y en el menú del pop-up con su precio (null = por confirmar).
       menu: [
         { plato: "Ensalada de pollo con orzo", precio: 4500, categorias: ["liviano", "saludable", "para-el-camino"] },
-        { plato: "Gnocchi a la vodka", precio: null, categorias: ["contundente"] }
+        { plato: "Gnocchi a la vodka", precio: 7990, categorias: ["contundente", "antojo"] }
       ]
     },
 
@@ -71,10 +67,8 @@ const DATOS = {
       horario: "Burga: 11:30 a 16:00 (según guía UC 2020). Resto del casino por confirmar.",
       comoComprar: "Haz la fila común para todos los productos, elige y paga en la caja, y ve al mesón donde preparan tu plato frente a ti. Hay mucho ruido: repite tu pedido y revísalo antes de que lo terminen.",
       menu: [
-        { plato: "Burrito", precio: null, categorias: ["contundente", "para-el-camino"] },
-        { plato: "Fajitas de pollo BBQ con verduras", precio: null, categorias: ["liviano", "saludable"] },
-        { plato: "Tacos", precio: 6000, categorias: [] },
-        { plato: "Hamburguesas (Burga)", precio: null, categorias: [] },
+        { plato: "Burrito", precio: 6000, categorias: ["contundente", "para-el-camino", "antojo"] },
+        { plato: "Hamburguesas (Burga)", precio: 4990, categorias: ["antojo"] },
         { plato: "Gohan", precio: null, categorias: [] },
         { plato: "Menú del casino", precio: null, categorias: [] }
       ]
@@ -91,7 +85,8 @@ const DATOS = {
       horario: "",
       comoComprar: "Revisa el menú del día en el papel que está en la caja.",
       menu: [
-        { plato: "Menú del día", precio: null, categorias: [] }
+        { plato: "Menú del día", precio: 3500, categorias: ["comida-casera"] },
+        { plato: "Ensalada César", precio: "", categorias: ["liviano", "saludable"] }
       ]
     },
 
@@ -106,7 +101,8 @@ const DATOS = {
       horario: "",
       comoComprar: "Hay tres filas: una para pedir (ahí te calientan la empanada), otra para pagar y otra para retirar. El local es pequeño y se llena rápido.",
       menu: [
-        { plato: "Empanada", precio: null, categorias: ["para-el-camino"] }
+        { plato: "Empanada Pino", precio: 2690, categorias: ["para-el-camino"] },
+        { plato: "Lasaña Boloñesa", precio: 5990, categorias: ["contundente"] }
       ]
     },
 
@@ -122,22 +118,8 @@ const DATOS = {
       comoComprar: "",
       menu: [
         { plato: "Sándwich", precio: 3000, categorias: ["para-el-camino"] },
-        { plato: "Empanada", precio: null, categorias: ["para-el-camino"] }
-      ]
-    },
-
-    {
-      id: "cafeteria-ingenieria",
-      nombre: "Cafetería de Ingeniería",
-      ubicacion: "dentro",
-      zona: "Facultad de Ingeniería",
-      ubicacionExacta: "Facultad de Ingeniería",
-      tipoComida: "Almuerzo casero",
-      tags: ["Económico"],
-      horario: "",
-      comoComprar: "",
-      menu: [
-        { plato: "Almuerzo casero del día", precio: null, categorias: [] }
+        { plato: "Empanada", precio: null, categorias: ["para-el-camino"] },
+        { plato: "Choclo con mayonesa", precio: 3590, categorias: ["para-el-camino"] }
       ]
     },
 
@@ -152,7 +134,7 @@ const DATOS = {
       horario: "",
       comoComprar: "",
       menu: [
-        { plato: "Pizza para compartir", precio: null, categorias: ["contundente"] }
+        { plato: "Pizza para compartir", precio: null, categorias: ["contundente", "antojo"] }
       ]
     },
 
@@ -167,7 +149,7 @@ const DATOS = {
       horario: "",
       comoComprar: "",
       menu: [
-        { plato: "Almuerzos varios", precio: null, categorias: [] }
+        { plato: "Sopaipillas", precio: 1000, categorias: ["para-el-camino"] }
       ]
     },
 
@@ -179,7 +161,7 @@ const DATOS = {
       zona: "Hall Central",
       ubicacionExacta: "Hall Central, 2º piso",
       tipoComida: "",
-      tags: ["Solo en guía UC 2020"],
+      tags: [],
       horario: "8:30 a 18:00 (según guía UC 2020, por confirmar)",
       comoComprar: "",
       menu: []
@@ -192,7 +174,7 @@ const DATOS = {
       zona: "Construcción Civil y Ciencias Sociales",
       ubicacionExacta: "Dos locales: detrás del edificio de aulas de Construcción Civil y detrás de Ciencias Sociales",
       tipoComida: "",
-      tags: ["Solo en guía UC 2020"],
+      tags: [],
       horario: "8:30 a 16:00 (según guía UC 2020, por confirmar)",
       comoComprar: "",
       menu: []
@@ -205,7 +187,7 @@ const DATOS = {
       zona: "Matemáticas / Deportes UC",
       ubicacionExacta: "Entre Matemáticas y Deportes UC",
       tipoComida: "",
-      tags: ["Solo en guía UC 2020"],
+      tags: [],
       horario: "12:00 a 14:00 (según guía UC 2020, por confirmar)",
       comoComprar: "",
       menu: []
@@ -218,7 +200,7 @@ const DATOS = {
       zona: "Facultad de Odontología",
       ubicacionExacta: "Patio de la Facultad de Odontología",
       tipoComida: "",
-      tags: ["Solo en guía UC 2020"],
+      tags: [],
       horario: "8:30 a 16:00 (según guía UC 2020, por confirmar)",
       comoComprar: "",
       menu: []
@@ -231,7 +213,7 @@ const DATOS = {
       zona: "Ingeniería Comercial y Humanidades",
       ubicacionExacta: "Casinos en Ingeniería Comercial y en Humanidades",
       tipoComida: "",
-      tags: ["Solo en guía UC 2020"],
+      tags: [],
       horario: "8:30 a 16:00 (según guía UC 2020, por confirmar)",
       comoComprar: "",
       menu: []
@@ -244,10 +226,12 @@ const DATOS = {
       zona: "Facultad de Agronomía",
       ubicacionExacta: "Detrás de la Facultad de Agronomía",
       tipoComida: "",
-      tags: ["Solo en guía UC 2020"],
+      tags: [],
       horario: "8:30 a 18:00 (según guía UC 2020, por confirmar)",
       comoComprar: "",
-      menu: []
+      menu: [
+        { plato: "Hot dog", precio: 3000, categorias: ["antojo"] }
+      ]
     },
 
     {
@@ -257,7 +241,7 @@ const DATOS = {
       zona: "Centro de Innovación",
       ubicacionExacta: "Centro de Innovación, 1er piso (primer edificio a la izquierda desde la entrada principal)",
       tipoComida: "",
-      tags: ["Solo en guía UC 2020"],
+      tags: [],
       horario: "8:00 a 18:00 (según guía UC 2020, por confirmar)",
       comoComprar: "",
       menu: []
@@ -266,11 +250,11 @@ const DATOS = {
     {
       id: "subway",
       nombre: "Subway",
-      ubicacion: "fuera",
-      zona: "Av. Vicuña Mackenna 4927",
-      ubicacionExacta: "Av. Vicuña Mackenna 4927 (junto a DUOC UC)",
+      ubicacion: "dentro",
+      zona: "Aulas Pataguas",
+      ubicacionExacta: "Bajo las Aulas Pataguas, 1er piso",
       tipoComida: "Sándwiches",
-      tags: ["Solo en guía UC 2020"],
+      tags: [],
       horario: "",
       comoComprar: "",
       menu: []
@@ -282,8 +266,8 @@ const DATOS = {
       ubicacion: "fuera",
       zona: "Av. Vicuña Mackenna 4927",
       ubicacionExacta: "Av. Vicuña Mackenna 4927 (junto a DUOC UC)",
-      tipoComida: "",
-      tags: ["Solo en guía UC 2020"],
+      tipoComida: "Hamburguesas",
+      tags: [],
       horario: "",
       comoComprar: "",
       menu: []
@@ -295,8 +279,8 @@ const DATOS = {
       ubicacion: "fuera",
       zona: "Av. Vicuña Mackenna 4927",
       ubicacionExacta: "Av. Vicuña Mackenna 4927, piso -1 (junto a DUOC UC)",
-      tipoComida: "",
-      tags: ["Solo en guía UC 2020"],
+      tipoComida: "Waffles",
+      tags: [],
       horario: "",
       comoComprar: "",
       menu: []
