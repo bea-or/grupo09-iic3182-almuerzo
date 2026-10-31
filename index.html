@@ -35,6 +35,7 @@
         <svg class="buscador-icono" viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><line x1="15.5" y1="15.5" x2="21" y2="21"/></svg>
         <input id="buscador" type="search" placeholder="Busca un local" autocomplete="off">
       </label>
+      <button type="button" class="chip" id="solo-no-probados" aria-pressed="false">Solo los que no he probado</button>
 
       <h2 class="seccion-titulo">En el campus:</h2>
       <div id="locales-dentro" class="grilla-tarjetas"></div>
@@ -78,6 +79,13 @@
             <div class="chips" data-grupo="ubicacion">
               <button type="button" class="chip" data-valor="dentro" aria-pressed="false">Dentro del campus</button>
               <button type="button" class="chip" data-valor="fuera" aria-pressed="false">Fuera del campus</button>
+            </div>
+          </div>
+
+          <div class="filtro-grupo" role="group" aria-labelledby="f-probados">
+            <h3 id="f-probados">Lugares</h3>
+            <div class="chips" data-grupo="probados">
+              <button type="button" class="chip" data-valor="no-probados" aria-pressed="false">Solo los que no he probado</button>
             </div>
           </div>
         </aside>
@@ -154,6 +162,31 @@
       return ubicacion === "dentro" ? "Dentro del campus" : "Fuera del campus";
     }
 
+    // ---------- Locales que la persona ya probó ----------
+    // Se guardan en el navegador (localStorage): siguen al recargar,
+    // pero no pasan a otro navegador o dispositivo.
+    const CLAVE_PROBADOS = "almuerzo-probados";
+
+    function leerProbados() {
+      try { return JSON.parse(localStorage.getItem(CLAVE_PROBADOS)) || []; }
+      catch (e) { return []; } // incógnito o almacenamiento bloqueado
+    }
+
+    function guardarProbados() {
+      try { localStorage.setItem(CLAVE_PROBADOS, JSON.stringify([...probados])); }
+      catch (e) { /* si no se puede guardar, igual funciona hasta recargar */ }
+    }
+
+    const probados = new Set(leerProbados());
+
+    function alternarProbado(id) {
+      if (probados.has(id)) probados.delete(id);
+      else probados.add(id);
+      guardarProbados();
+      renderVerLocales();
+      renderElige();
+    }
+
     // ---------- Vista: Ver locales ----------
     let textoBusqueda = "";
 
@@ -168,7 +201,14 @@
           <p class="tarjeta-linea">${esc(local.zona)}</p>
           <p class="tarjeta-linea">${esc(local.tipoComida)}</p>
           ${tags ? `<ul class="tags">${tags}</ul>` : ""}
+          ${botonProbado(local)}
         </article>`;
+    }
+
+    function botonProbado(local) {
+      const probado = probados.has(local.id);
+      return `<button type="button" class="boton-probado" data-id="${esc(local.id)}" aria-pressed="${probado}">`
+        + `${probado ? "✓ Ya lo probaste" : "Ya lo probé"}<span class="visualmente-oculto"> ${esc(local.nombre)}</span></button>`;
     }
 
     function renderVerLocales() {
@@ -177,12 +217,19 @@
         .some((campo) => normalizar(campo).includes(q));
 
       for (const ubicacion of ["dentro", "fuera"]) {
-        const lista = locales.filter((l) => l.ubicacion === ubicacion && coincide(l));
+        const enZona = locales.filter((l) => l.ubicacion === ubicacion && coincide(l));
+        // Los probados se quedan en su lugar; solo se ocultan si se pide ver los que faltan.
+        const lista = soloNoProbados ? enZona.filter((l) => !probados.has(l.id)) : enZona;
+        let vacio = "Aún no hay locales en esta sección.";
+        if (q && !enZona.length) vacio = "Ningún local coincide con la búsqueda.";
+        else if (enZona.length) vacio = "Ya probaste todos los locales de esta sección.";
         $("locales-" + ubicacion).innerHTML = lista.length
           ? lista.map(tarjetaLocal).join("")
-          : `<p class="vacio">${q ? "Ningún local coincide con la búsqueda." : "Aún no hay locales en esta sección."}</p>`;
+          : `<p class="vacio">${vacio}</p>`;
       }
     }
+
+    let soloNoProbados = false;
 
     $("fecha-actualizacion").textContent = formatearFecha(DATOS.ultimaActualizacion);
     $("buscador").addEventListener("input", (e) => {
@@ -190,15 +237,32 @@
       renderVerLocales();
     });
 
+    $("solo-no-probados").addEventListener("click", (e) => {
+      soloNoProbados = !soloNoProbados;
+      e.currentTarget.setAttribute("aria-pressed", String(soloNoProbados));
+      renderVerLocales();
+    });
+
+    $("vista-ver-locales").addEventListener("click", (e) => {
+      const boton = e.target.closest(".boton-probado");
+      if (!boton) return;
+      const id = boton.dataset.id;
+      alternarProbado(id);
+      // La lista se redibuja: devolver el foco al mismo botón (sin mover la página).
+      const nuevo = document.querySelector(`.boton-probado[data-id="${CSS.escape(id)}"]`);
+      if (nuevo) nuevo.focus({ preventScroll: true });
+    });
+
     // ---------- Vista: Elige dónde almorzar ----------
     // Un valor por grupo (null = sin filtro en ese grupo).
-    const filtros = { precio: null, categoria: null, ubicacion: null };
+    const filtros = { precio: null, categoria: null, ubicacion: null, probados: null };
 
     function cumpleFiltros(local, plato) {
       if (filtros.precio && filtros.precio !== "sin-limite" &&
           !(Number.isFinite(plato.precio) && plato.precio <= Number(filtros.precio))) return false;
       if (filtros.categoria && !(plato.categorias || []).includes(filtros.categoria)) return false;
       if (filtros.ubicacion && local.ubicacion !== filtros.ubicacion) return false;
+      if (filtros.probados && probados.has(local.id)) return false;
       return true;
     }
 
@@ -212,9 +276,10 @@
       antojo: "Antojo"
     };
 
-    function etiquetasCategorias(plato) {
-      const items = (plato.categorias || [])
+    function etiquetasCategorias(local, plato) {
+      let items = (plato.categorias || [])
         .map((c) => `<li class="tag tag-categoria">${esc(NOMBRE_CATEGORIA[c] || c)}</li>`).join("");
+      if (probados.has(local.id)) items += `<li class="tag tag-categoria">✓ Ya lo probaste</li>`;
       return items ? `<ul class="tags">${items}</ul>` : "";
     }
 
@@ -239,7 +304,7 @@
                 </div>
                 <span class="resultado-precio">${Number.isFinite(plato.precio) ? "≈ " + esc(formatearPrecio(plato.precio)) : ""}</span>
               </div>
-              ${etiquetasCategorias(plato)}
+              ${etiquetasCategorias(local, plato)}
               <a class="boton boton-secundario" href="#local-${encodeURIComponent(local.id)}">Más información<span class="visualmente-oculto"> ${esc(local.nombre)}</span></a>
             </article>`).join("")
         : `<p class="vacio">No hay opciones con estos filtros. Prueba quitando alguno.</p>`;

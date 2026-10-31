@@ -42,11 +42,11 @@ const DATOS = {
       tipoComida: "Platos preparados y ensaladas",
 
       // Etiquetas libres que se ven en la tarjeta (ej: precio aproximado).
-      tags: ["~$4.500-8.000", "Fila hacia las 13:30"],
+      tags: ["~$4.500-8.000"],
 
       horario: "8:00 a 19:00 (según guía UC 2020, por confirmar)",
 
-      comoComprar: "Saca tu plato del refrigerador, haz la fila de autoservicio y paga. Cerca de las 12:00 está tranquilo; hacia las 13:30 hay fila.",
+      comoComprar: "Saca tu plato del refrigerador y paga en la caja de autoservicio.",
 
       // Platos del local. Cada plato aparece en "Elige dónde almorzar"
       // y en el menú del pop-up con su precio (null = por confirmar).
@@ -63,9 +63,9 @@ const DATOS = {
       zona: "Edificio K",
       ubicacionExacta: "Edificio K (Ciencia y Tecnología, Ingeniería), 1er piso",
       tipoComida: "Burritos, tacos, fajitas, hamburguesas y casino",
-      tags: ["~$6.000", "Se llena a la hora de almuerzo"],
+      tags: ["~$6.000"],
       horario: "Burga: 11:30 a 16:00 (según guía UC 2020). Resto del casino por confirmar.",
-      comoComprar: "Haz la fila común para todos los productos, elige y paga en la caja, y ve al mesón donde preparan tu plato frente a ti. Hay mucho ruido: repite tu pedido y revísalo antes de que lo terminen.",
+      comoComprar: "Elige y paga en la caja, y luego ve al mesón donde preparan tu plato frente a ti. Hay mucho ruido: repite tu pedido y revísalo antes de que lo terminen.",
       menu: [
         { plato: "Burrito", precio: 6000, categorias: ["contundente", "para-el-camino", "antojo"] },
         { plato: "Hamburguesas (Burga)", precio: 4990, categorias: ["antojo"] },
@@ -97,9 +97,9 @@ const DATOS = {
       zona: "Complejo Andrónico Luksic",
       ubicacionExacta: "Patio fuera del Complejo Andrónico Luksic",
       tipoComida: "Empanadas",
-      tags: ["Muy lleno a la hora de almuerzo"],
+      tags: [],
       horario: "",
-      comoComprar: "Hay tres filas: una para pedir (ahí te calientan la empanada), otra para pagar y otra para retirar. El local es pequeño y se llena rápido.",
+      comoComprar: "Se pide en un mesón (ahí te calientan la empanada), se paga en otro y se retira en un tercero.",
       menu: [
         { plato: "Empanada Pino", precio: 2690, categorias: ["para-el-camino"] },
         { plato: "Lasaña Boloñesa", precio: 5990, categorias: ["contundente"] }

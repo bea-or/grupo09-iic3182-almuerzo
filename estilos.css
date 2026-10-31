@@ -243,6 +243,25 @@ main { max-width: var(--ancho-max); margin: 0 auto; padding: 28px 16px 56px; }
 }
 .boton-secundario:hover { background: var(--celeste); }
 
+/* "Ya lo probé" al pie de cada tarjeta de local; marcado = fondo celeste con ✓ */
+.boton-probado {
+  align-self: flex-start; margin-top: 10px;
+  min-height: var(--toque); padding: 0 16px;
+  font: inherit; font-size: 0.95rem; font-weight: 700; color: var(--azul);
+  background: var(--superficie);
+  border: 2px solid var(--azul); border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.boton-probado:hover { background: var(--celeste); }
+.boton-probado[aria-pressed="true"] { background: var(--celeste); border-color: var(--celeste); }
+.boton-probado[aria-pressed="true"]:hover { border-color: var(--azul); }
+
+#solo-no-probados { margin-top: 12px; }
+
+/* Que el atributo hidden siempre oculte, aunque el elemento tenga display: grid */
+[hidden] { display: none !important; }
+
 /* ===== Pop-up de detalle ===== */
 .detalle {
   width: min(540px, calc(100vw - 32px)); max-height: calc(100dvh - 32px);
